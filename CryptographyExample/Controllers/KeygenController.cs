@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -27,6 +28,14 @@ namespace CryptographyExample.Controllers
 			{
 				model.AesKey = Convert.ToBase64String(aes.Key);
 				model.AesIv = Convert.ToBase64String(aes.IV);
+			}
+
+			using (var rsaCryptoServiceProvider = new RSACryptoServiceProvider())
+			{
+				// export the parameters (private key)
+				var parameterBlob = rsaCryptoServiceProvider.ExportCspBlob(true);
+
+				model.AsymmetricPrivateKey = Convert.ToBase64String(parameterBlob);
 			}
 
 			return View(model);

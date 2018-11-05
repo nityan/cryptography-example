@@ -39,5 +39,12 @@ namespace CryptographyExample.Models.KeygenModels
 		/// <value>The AES IV.</value>
 		[Display(Name = "AES IV")]
 		public string AesIv { get; set; }
+
+		/// <summary>
+		/// Gets or sets the asymmetric private key.
+		/// </summary>
+		/// <value>The asymmetric private key.</value>
+		[Display(Name = "Asymmetric Private Key")]
+		public string AsymmetricPrivateKey { get; set; }
 	}
 }

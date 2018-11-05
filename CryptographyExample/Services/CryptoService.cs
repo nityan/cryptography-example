@@ -34,9 +34,19 @@ namespace CryptographyExample.Services
 		private readonly string aesIv;
 
 		/// <summary>
+		/// The asymmetric private key.
+		/// </summary>
+		private readonly string asymmetricPrivateKey;
+
+		/// <summary>
 		/// The HMAC key.
 		/// </summary>
 		private readonly string hmacKey;
+
+		/// <summary>
+		/// The use asymmetric encryption.
+		/// </summary>
+		private readonly bool useAsymmetricEncryption;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="CreditCardService" /> class.
@@ -47,6 +57,8 @@ namespace CryptographyExample.Services
 			this.aesKey = this.configuration.GetValue<string>("AesKey");
 			this.aesIv = this.configuration.GetValue<string>("AesIv");
 			this.hmacKey = this.configuration.GetValue<string>("HmacKey");
+			this.useAsymmetricEncryption = this.configuration.GetValue<bool>("UseAsymmetricEncryption");
+			this.asymmetricPrivateKey = this.configuration.GetValue<string>("AsymmetricPrivateKey");
 		}
 
 		/// <summary>
@@ -63,16 +75,32 @@ namespace CryptographyExample.Services
 
 			string result;
 
-			using (var aes = Aes.Create())
+			if (!this.useAsymmetricEncryption)
 			{
-				aes.Key = Convert.FromBase64String(this.aesKey);
-				aes.IV = Convert.FromBase64String(this.aesIv);
+				using (var aes = Aes.Create())
+				{
+					aes.Key = Convert.FromBase64String(this.aesKey);
+					aes.IV = Convert.FromBase64String(this.aesIv);
 
-				var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+					var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
 
-				var input = Convert.FromBase64String(encryptedContent);
+					var input = Convert.FromBase64String(encryptedContent);
 
-				result = Encoding.UTF8.GetString(decryptor.TransformFinalBlock(input, 0, input.Length));
+					result = Encoding.UTF8.GetString(decryptor.TransformFinalBlock(input, 0, input.Length));
+				}
+			}
+			else
+			{
+				using (var rsaCryptoServiceProvider = new RSACryptoServiceProvider())
+				{
+					// import the private key
+					rsaCryptoServiceProvider.ImportCspBlob(Convert.FromBase64String(asymmetricPrivateKey));
+
+					var dataToEncrypt = Convert.FromBase64String(encryptedContent);
+					var decryptedData = rsaCryptoServiceProvider.Decrypt(dataToEncrypt, true);
+
+					result = Encoding.UTF8.GetString(decryptedData);
+				}
 			}
 
 			return result;
@@ -92,16 +120,31 @@ namespace CryptographyExample.Services
 
 			string result;
 
-			using (var aes = Aes.Create())
+			if (!this.useAsymmetricEncryption)
 			{
-				aes.Key = Convert.FromBase64String(this.aesKey);
-				aes.IV = Convert.FromBase64String(this.aesIv);
+				using (var aes = Aes.Create())
+				{
+					aes.Key = Convert.FromBase64String(this.aesKey);
+					aes.IV = Convert.FromBase64String(this.aesIv);
 
-				var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+					var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
 
-				var input = Encoding.UTF8.GetBytes(content);
+					var input = Encoding.UTF8.GetBytes(content);
 
-				result = Convert.ToBase64String(encryptor.TransformFinalBlock(input, 0, input.Length));
+					result = Convert.ToBase64String(encryptor.TransformFinalBlock(input, 0, input.Length));
+				}
+			}
+			else
+			{
+				using (var rsaCryptoServiceProvider = new RSACryptoServiceProvider())
+				{
+					rsaCryptoServiceProvider.ImportCspBlob(Convert.FromBase64String(asymmetricPrivateKey));
+
+					var dataToEncrypt = Encoding.UTF8.GetBytes(content);
+					var encryptedData = rsaCryptoServiceProvider.Encrypt(dataToEncrypt, true);
+
+					result = Convert.ToBase64String(encryptedData);
+				}
 			}
 
 			return result;

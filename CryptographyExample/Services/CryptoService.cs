@@ -123,7 +123,10 @@ namespace CryptographyExample.Services
 
 				var hashValue = hmac.ComputeHash(inStream);
 
-				var outStream = new MemoryStream(hashValue);
+				var outStream = new MemoryStream();
+
+				// MUST RE-POSITION the stream
+				inStream.Position = 0;
 
 				outStream.Write(hashValue, 0, hashValue.Length);
 
@@ -144,7 +147,7 @@ namespace CryptographyExample.Services
 
 			if (!this.VerifySignedContent(content))
 			{
-				//throw new InvalidOperationException("Unable to verify HMAC signature");
+				throw new InvalidOperationException("Unable to verify HMAC signature");
 			}
 
 			return content;

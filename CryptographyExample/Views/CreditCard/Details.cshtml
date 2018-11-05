@@ -20,13 +20,13 @@
             @Html.DisplayNameFor(model => model.EncryptedCreditCard)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.EncryptedCreditCard)
+            @Html.TextAreaFor(model => model.EncryptedCreditCard, new { @class = "form-control", cols="20", rows = 5, @readonly = "readonly"})
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.SignedCreditCard)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.SignedCreditCard)
+            @Html.TextAreaFor(model => model.SignedCreditCard, new { @class = "form-control", cols = "20", rows = 5, @readonly = "readonly" })
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.PlainTextCreditCard)

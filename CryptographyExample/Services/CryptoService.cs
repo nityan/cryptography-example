@@ -77,28 +77,47 @@ namespace CryptographyExample.Services
 
 			if (!this.useAsymmetricEncryption)
 			{
+				// create an instance of the AES encryption algorithm
 				using (var aes = Aes.Create())
 				{
+					// supply the key 
 					aes.Key = Convert.FromBase64String(this.aesKey);
+
+					// supply the initialization vector
 					aes.IV = Convert.FromBase64String(this.aesIv);
 
+					// create the decryptor instance which will be used to decrypt our data
 					var decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
 
+					// convert the content from a base 64 encoded string
+					// to a byte array
 					var input = Convert.FromBase64String(encryptedContent);
 
-					result = Encoding.UTF8.GetString(decryptor.TransformFinalBlock(input, 0, input.Length));
+					// decrypt the content
+					// input - encrypted content
+					// 0 - represents the offset value to indicate where to start the decryption process
+					// input.Length - represents the the length of content to be decrypted
+					var decryptedContent = decryptor.TransformFinalBlock(input, 0, input.Length);
+
+					// convert the result back to a human readable string
+					result = Encoding.UTF8.GetString(decryptedContent);
 				}
 			}
 			else
 			{
+				// create the RSA crypto service provider
 				using (var rsaCryptoServiceProvider = new RSACryptoServiceProvider())
 				{
 					// import the private key
 					rsaCryptoServiceProvider.ImportCspBlob(Convert.FromBase64String(asymmetricPrivateKey));
 
+					// convert the encrypted data from a base 64 encoded string
 					var dataToEncrypt = Convert.FromBase64String(encryptedContent);
+
+					// decrypt the data
 					var decryptedData = rsaCryptoServiceProvider.Decrypt(dataToEncrypt, true);
 
+					// convert the decrypted byte array back to the original string
 					result = Encoding.UTF8.GetString(decryptedData);
 				}
 			}
@@ -122,27 +141,57 @@ namespace CryptographyExample.Services
 
 			if (!this.useAsymmetricEncryption)
 			{
+				// this is symmetric encryption
+				// create a new instance of the AES class
 				using (var aes = Aes.Create())
 				{
+					// the key to use to encrypt the data
 					aes.Key = Convert.FromBase64String(this.aesKey);
+
+					// the IV to use to as the start of the encrypted data 
 					aes.IV = Convert.FromBase64String(this.aesIv);
 
+					// create the encryptor instance
+					// using the AES algorithm
+					// supply the key and initialization vector
+					// to create the encryptor instance
 					var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
 
+					// get the UTF-8 bytes of our content to encrypt
+					// use the encoding class, with the UTF-8 encoding
+					// to retrieve the bytes copy of the original content
 					var input = Encoding.UTF8.GetBytes(content);
 
-					result = Convert.ToBase64String(encryptor.TransformFinalBlock(input, 0, input.Length));
+					// [[IV, some random data]]
+					// apply the key and the encryption algorithm
+					// use the encryptor to encrypt our data
+					// input is the data to encrypt
+					// 0 represents the offset of the byte array
+					// input.Length represents the length of the byte array content
+					// to be encrypted
+					var encryptedContent = encryptor.TransformFinalBlock(input, 0, input.Length);
+
+					// convert the encrypted content to a base 64 encoded string
+					result = Convert.ToBase64String(encryptedContent);
 				}
 			}
 			else
 			{
+				// create the RSA crypto service provider
 				using (var rsaCryptoServiceProvider = new RSACryptoServiceProvider())
 				{
+					// import the public private key pair
 					rsaCryptoServiceProvider.ImportCspBlob(Convert.FromBase64String(asymmetricPrivateKey));
 
+					// get the byte array content of the data to encrypt
+					// using the UTF-8 encoding
 					var dataToEncrypt = Encoding.UTF8.GetBytes(content);
+
+					// encrypt the data
+					// include padding during the encryption process, to add to the randomness of the encrypted data
 					var encryptedData = rsaCryptoServiceProvider.Encrypt(dataToEncrypt, true);
 
+					// convert the encrypted content to a base 64 encoded string
 					result = Convert.ToBase64String(encryptedData);
 				}
 			}
@@ -159,18 +208,22 @@ namespace CryptographyExample.Services
 		{
 			string content;
 
-			// Initialize the keyed hash object.
+			// Initialize the keyed hash object
 			using (var hmac = new HMACSHA512(Convert.FromBase64String(this.hmacKey)))
 			{
+				// read in the encrypted content
 				var inStream = new MemoryStream(encryptedContent);
 
+				// compute the hash value of the encrypted content
 				var hashValue = hmac.ComputeHash(inStream);
 
+				// create an out stream to write out signed content to
 				var outStream = new MemoryStream();
 
 				// MUST RE-POSITION the stream
 				inStream.Position = 0;
 
+				// write the computed hash value to the output stream
 				outStream.Write(hashValue, 0, hashValue.Length);
 
 				int bytesRead;
@@ -180,11 +233,15 @@ namespace CryptographyExample.Services
 
 				do
 				{
-					// Read from the wrapping CryptoStream.
+					// Read from the wrapping CryptoStream
+					// read 1K at a time until we get to the end of the stream
 					bytesRead = inStream.Read(buffer, 0, 1024);
+
+					// write the output to the stream
 					outStream.Write(buffer, 0, bytesRead);
 				} while (bytesRead > 0);
 
+				// convert the output stream to a Base64 encoded string
 				content = Convert.ToBase64String(outStream.ToArray());
 			}
 
@@ -208,21 +265,28 @@ namespace CryptographyExample.Services
 
 			var sourceContent = Convert.FromBase64String(signedContent);
 
-			// Initialize the keyed hash object.
+			// Initialize the keyed hash object
 			using (var hmac = new HMACSHA512(Convert.FromBase64String(this.hmacKey)))
 			using (var inStream = new MemoryStream(sourceContent))
 			{
 				// Create an array to hold the keyed hash value read from the content.
+				// the Hash size is 512 bytes here
+				// divide that by 8 to ensure we have a correct number of bytes
 				var storedHash = new byte[hmac.HashSize / 8];
 
-				// Read in the storedHash.
+				// Read in the storedHash
 				inStream.Read(storedHash, 0, storedHash.Length);
 
 				// Compute the hash of the remaining contents.
-				// The stream is properly positioned at the beginning of the content, immediately after the stored hash value.
+				// The stream is properly positioned at the beginning of the content,
+				// immediately after the stored hash value.
 				var computedHash = hmac.ComputeHash(inStream);
 
 				// compare the computed hash with the stored value
+				// for each byte in each array of the stored has
+				// and the computed hash, we want to compare each byte
+				// to ensure that the signed message has not been
+				// tampered with during transport
 				for (var i = 0; i < storedHash.Length; i++)
 				{
 					if (computedHash[i] != storedHash[i])

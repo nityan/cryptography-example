@@ -24,6 +24,7 @@ namespace CryptographyExample.Controllers
 
 			model.HmacKey = Convert.ToBase64String(hmacKey);
 
+			// creates a new key and IV every time
 			using (var aes = Aes.Create())
 			{
 				model.AesKey = Convert.ToBase64String(aes.Key);

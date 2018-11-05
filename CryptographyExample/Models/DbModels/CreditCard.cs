@@ -47,13 +47,6 @@ namespace CryptographyExample.Models.DbModels
 		public DateTime CreationTime { get; set; }
 
 		/// <summary>
-		/// Gets or sets the plain text credit card.
-		/// </summary>
-		/// <value>The plain text credit card.</value>
-		[NotMapped]
-		public string PlainTextCreditCard { get; set; }
-
-		/// <summary>
 		/// Gets or sets the encrypted credit card.
 		/// </summary>
 		/// <value>The encrypted credit card.</value>
@@ -66,5 +59,12 @@ namespace CryptographyExample.Models.DbModels
 		/// <value>The signed credit card.</value>
 		[Required]
 		public string SignedCreditCard { get; set; }
+
+		/// <summary>
+		/// Gets or sets the CVC code.
+		/// </summary>
+		/// <value>The CVC code.</value>
+		[Required]
+		public byte[] CvcCode { get; set; }
 	}
 }

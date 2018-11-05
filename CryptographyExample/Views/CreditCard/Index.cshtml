@@ -31,7 +31,7 @@
                 @Html.DisplayTextFor(model => item.CreationTime)
             </td>
             <td>
-                @Html.DisplayTextFor(model => item.EncryptedCreditCard)
+                @Html.TextAreaFor(model => item.EncryptedCreditCard, new { @class = "form-control", cols = "25", rows = "10", @readonly = "readonly" })
             </td>
             <td>
                 @Html.TextAreaFor(model => item.SignedCreditCard, new { @class = "form-control", cols = "25", rows = "10", @readonly = "readonly" })

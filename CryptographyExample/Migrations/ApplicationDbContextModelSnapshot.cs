@@ -78,6 +78,9 @@ namespace CryptographyExample.Migrations
 
                     b.Property<DateTime>("CreationTime");
 
+                    b.Property<byte[]>("CvcCode")
+                        .IsRequired();
+
                     b.Property<string>("EncryptedCreditCard")
                         .IsRequired();
 

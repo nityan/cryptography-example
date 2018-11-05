@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using CryptographyExample.Models.DbModels;
 
@@ -28,6 +29,7 @@ namespace CryptographyExample.Models.CreditCardModels
 		{
 			this.Id = creditCard.Id;
 			this.CreationTime = creditCard.CreationTime;
+			this.CvcCode = Encoding.UTF8.GetString(creditCard.CvcCode);
 			this.EncryptedCreditCard = creditCard.EncryptedCreditCard;
 			this.SignedCreditCard = creditCard.SignedCreditCard;
 		}
@@ -44,6 +46,13 @@ namespace CryptographyExample.Models.CreditCardModels
 		/// <value>The creation time.</value>
 		[Display(Name = "Creation Time")]
 		public DateTime CreationTime { get; set; }
+
+		/// <summary>
+		/// Gets or sets the CVC code.
+		/// </summary>
+		/// <value>The CVC code.</value>
+		[Display(Name = "CVC Code")]
+		public string CvcCode { get; set; }
 
 		/// <summary>
 		/// Gets or sets the plain text credit card.

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace CryptographyExample.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -54,6 +54,7 @@ namespace CryptographyExample.Migrations
                 {
                     Id = table.Column<Guid>(nullable: false),
                     CreationTime = table.Column<DateTime>(nullable: false),
+                    CvcCode = table.Column<byte[]>(nullable: false),
                     EncryptedCreditCard = table.Column<string>(nullable: false),
                     SignedCreditCard = table.Column<string>(nullable: false)
                 },

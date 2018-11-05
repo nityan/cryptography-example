@@ -1,16 +1,13 @@
 ﻿using CryptographyExample.Data;
 using CryptographyExample.Models.DbModels;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace CryptographyExample.Services
 {
@@ -32,13 +29,20 @@ namespace CryptographyExample.Services
 		private readonly ICryptoService cryptoService;
 
 		/// <summary>
+		/// The data protector.
+		/// </summary>
+		private readonly IDataProtector dataProtector;
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="CreditCardService" /> class.
 		/// </summary>
 		/// <param name="cryptoService">The crypto service.</param>
 		/// <param name="context">The context.</param>
-		public CreditCardService(ICryptoService cryptoService, ApplicationDbContext context)
+		/// <param name="dataProtectionProvider">The data protection provider.</param>
+		public CreditCardService(ICryptoService cryptoService, ApplicationDbContext context, IDataProtectionProvider dataProtectionProvider)
 		{
 			this.context = context;
+			this.dataProtector = dataProtectionProvider.CreateProtector("CvcCodeProtector");
 			this.cryptoService = cryptoService;
 		}
 
@@ -46,14 +50,16 @@ namespace CryptographyExample.Services
 		/// Creates the credit card asynchronously.
 		/// </summary>
 		/// <param name="creditCard">The credit card.</param>
+		/// <param name="cvcCode">The CVC code.</param>
 		/// <returns>Returns the id of the created credit card.</returns>
-		public async Task<CreditCard> CreateCreditCardAsync(string creditCard)
+		public async Task<CreditCard> CreateCreditCardAsync(string creditCard, string cvcCode)
 		{
 			var encryptedContent = this.cryptoService.EncryptContent(creditCard);
 			var signedContent = this.cryptoService.SignContent(Convert.FromBase64String(encryptedContent));
 
 			var cc = new CreditCard(Guid.NewGuid(), DateTime.Now)
 			{
+				CvcCode = this.dataProtector.Protect(Encoding.UTF8.GetBytes(cvcCode)),
 				EncryptedCreditCard = encryptedContent,
 				SignedCreditCard = signedContent
 			};
@@ -86,6 +92,8 @@ namespace CryptographyExample.Services
 				throw new KeyNotFoundException($"Unable to find credit card using id: {id}");
 			}
 
+			creditCard.CvcCode = this.dataProtector.Unprotect(creditCard.CvcCode);
+
 			return creditCard;
 		}
 
@@ -106,6 +114,11 @@ namespace CryptographyExample.Services
 			}
 
 			creditCards = creditCards.Take(count ?? 25);
+
+			foreach (var creditCard in creditCards)
+			{
+				creditCard.CvcCode = this.dataProtector.Unprotect(creditCard.CvcCode);
+			}
 
 			return await creditCards.ToListAsync();
 		}

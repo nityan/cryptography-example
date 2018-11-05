@@ -11,8 +11,8 @@ using System;
 namespace CryptographyExample.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20181105025525_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20181105051315_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -78,6 +78,9 @@ namespace CryptographyExample.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("CreationTime");
+
+                    b.Property<byte[]>("CvcCode")
+                        .IsRequired();
 
                     b.Property<string>("EncryptedCreditCard")
                         .IsRequired();

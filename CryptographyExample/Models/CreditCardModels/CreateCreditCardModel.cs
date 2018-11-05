@@ -26,5 +26,13 @@ namespace CryptographyExample.Models.CreditCardModels
 		[Required]
 		[DataType(DataType.CreditCard)]
 		public ulong CreditCard { get; set; }
+
+		/// <summary>
+		/// Gets or sets the CVC code.
+		/// </summary>
+		/// <value>The CVC code.</value>
+		[Required]
+		[Range(000, 999)]
+		public uint CvcCode { get; set; }
 	}
 }

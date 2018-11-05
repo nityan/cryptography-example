@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
 
 namespace CryptographyExample.Controllers
@@ -64,7 +65,7 @@ namespace CryptographyExample.Controllers
 					return View(model);
 				}
 
-				var creditCard = await this.creditCardService.CreateCreditCardAsync(model.CreditCard.ToString());
+				var creditCard = await this.creditCardService.CreateCreditCardAsync(model.CreditCard.ToString(), model.CvcCode.ToString());
 
 				return RedirectToAction("Details", new { id = creditCard.Id });
 			}

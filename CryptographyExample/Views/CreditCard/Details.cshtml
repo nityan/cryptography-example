@@ -1,0 +1,41 @@
+﻿@model CryptographyExample.Models.CreditCardModels.CreditCardViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Credit Card</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.CreationTime)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CreationTime)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.EncryptedCreditCard)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.EncryptedCreditCard)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SignedCreditCard)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SignedCreditCard)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PlainTextCreditCard)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PlainTextCreditCard)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

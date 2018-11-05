@@ -1,0 +1,36 @@
+﻿@model CryptographyExample.Models.KeygenModels.KeygenModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                <label asp-for="HmacKey"></label>
+            </th>
+            <th>
+                <label asp-for="AesKey"></label>
+            </th>
+            <th>
+                <label asp-for="AesIv"></label>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>
+            <textarea asp-for="HmacKey" class="form-control" readonly="readonly" cols="10" rows="5"></textarea>
+        </td>
+        <td>
+            <textarea asp-for="AesKey" class="form-control" readonly="readonly" cols="10" rows="5"></textarea>
+        </td>
+        <td>
+            <textarea asp-for="AesIv" class="form-control" readonly="readonly" cols="10" rows="5"></textarea>
+        </td>
+    </tr>
+    </tbody>
+</table>

@@ -1,5 +1,7 @@
 ﻿using CryptographyExample.Models.DbModels;
 using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace CryptographyExample.Services
@@ -17,24 +19,6 @@ namespace CryptographyExample.Services
 		Task<CreditCard> CreateCreditCardAsync(string creditCard);
 
 		/// <summary>
-		/// Decrypts the credit card.
-		/// </summary>
-		/// <param name="encryptedCreditCard">The encrypted credit card.</param>
-		/// <param name="key">The key.</param>
-		/// <param name="iv">The iv.</param>
-		/// <returns>System.String.</returns>
-		string DecryptCreditCard(string encryptedCreditCard, string key, string iv);
-
-		/// <summary>
-		/// Encrypts the credit card.
-		/// </summary>
-		/// <param name="creditCard">The credit card.</param>
-		/// <param name="key">The key.</param>
-		/// <param name="iv">The iv.</param>
-		/// <returns>Returns the encrypted credit card.</returns>
-		string EncryptCreditCard(string creditCard, string key, string iv);
-
-		/// <summary>
 		/// Gets the credit card asynchronously.
 		/// </summary>
 		/// <param name="id">The identifier.</param>
@@ -42,19 +26,12 @@ namespace CryptographyExample.Services
 		Task<CreditCard> GetCreditCardAsync(Guid id);
 
 		/// <summary>
-		/// Signs the credit card.
+		/// Finds a list of credit cards which match the specified expression.
 		/// </summary>
-		/// <param name="encryptedContent">Content of the encrypted.</param>
-		/// <param name="key">The key.</param>
-		/// <returns>Returns the signed credit card.</returns>
-		string SignCreditCard(byte[] encryptedContent, string key);
-
-		/// <summary>
-		/// Verifies the signed credit card.
-		/// </summary>
-		/// <param name="key">The key.</param>
-		/// <param name="signedCreditCard">The signed credit card.</param>
-		/// <returns><c>true</c> if unable to verify the signed credit card, <c>false</c> otherwise.</returns>
-		bool VerifySignedCreditCard(string key, string signedCreditCard);
+		/// <param name="expression">The expression.</param>
+		/// <param name="count">The count.</param>
+		/// <param name="offset">The offset.</param>
+		/// <returns>Returns a list of credit cards which match the specified expression.</returns>
+		Task<IEnumerable<CreditCard>> QueryAsync(Expression<Func<CreditCard, bool>> expression, int? count, int offset);
 	}
 }

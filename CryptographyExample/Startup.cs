@@ -71,6 +71,7 @@ namespace CryptographyExample
 				.AddDefaultTokenProviders();
 
 			// Add application services
+			services.AddTransient<ICryptoService, CryptoService>();
 			services.AddTransient<ICreditCardService, CreditCardService>();
 			services.AddTransient<IEmailSender, EmailSender>();
 

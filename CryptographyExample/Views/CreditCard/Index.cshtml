@@ -28,17 +28,16 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayNameFor(model => model.CreationTime)
+                @Html.DisplayTextFor(model => item.CreationTime)
             </td>
             <td>
-                @Html.DisplayNameFor(model => model.EncryptedCreditCard)
+                @Html.DisplayTextFor(model => item.EncryptedCreditCard)
             </td>
             <td>
-                @Html.DisplayNameFor(model => model.SignedCreditCard)
+                @Html.DisplayTextFor(model => item.SignedCreditCard)
             </td>
             <td>
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
             </td>
         </tr>
 }

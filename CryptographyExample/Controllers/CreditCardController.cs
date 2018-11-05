@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 
@@ -17,26 +18,30 @@ namespace CryptographyExample.Controllers
 	public class CreditCardController : Controller
 	{
 		/// <summary>
-		/// The configuration.
-		/// </summary>
-		private readonly IConfiguration configuration;
-
-		/// <summary>
 		/// The credit card service.
 		/// </summary>
 		private readonly ICreditCardService creditCardService;
 
 		/// <summary>
+		/// The crypto service.
+		/// </summary>
+		private readonly ICryptoService cryptoService;
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="CreditCardController" /> class.
 		/// </summary>
+		/// <param name="cryptoService">The crypto service.</param>
 		/// <param name="creditCardService">The credit card service.</param>
-		public CreditCardController(IConfiguration configuration, ICreditCardService creditCardService)
+		public CreditCardController(ICryptoService cryptoService, ICreditCardService creditCardService)
 		{
-			this.configuration = configuration;
+			this.cryptoService = cryptoService;
 			this.creditCardService = creditCardService;
 		}
 
-		// GET: Cryptography/Create
+		/// <summary>
+		/// Displays the create view.
+		/// </summary>
+		/// <returns>Returns an action result.</returns>
 		public ActionResult Create()
 		{
 			return View();
@@ -63,40 +68,11 @@ namespace CryptographyExample.Controllers
 
 				return RedirectToAction("Details", new { id = creditCard.Id });
 			}
-			catch
+			catch (Exception e)
 			{
-				return View();
-			}
-		}
+				this.ModelState.AddModelError("", "Unable to create credit card");
+				Trace.TraceError($"Unable to create credit card: {e}");
 
-		/// <summary>
-		/// Displays the delete view.
-		/// </summary>
-		/// <param name="id">The identifier.</param>
-		/// <returns>Returns an action result.</returns>
-		public ActionResult Delete(int id)
-		{
-			return View();
-		}
-
-		/// <summary>
-		/// Deletes a credit card.
-		/// </summary>
-		/// <param name="id">The identifier.</param>
-		/// <param name="collection">The collection.</param>
-		/// <returns>Returns an action result.</returns>
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public ActionResult Delete(int id, IFormCollection collection)
-		{
-			try
-			{
-				// TODO: Add delete logic here
-
-				return RedirectToAction(nameof(Index));
-			}
-			catch
-			{
 				return View();
 			}
 		}
@@ -118,21 +94,37 @@ namespace CryptographyExample.Controllers
 				model = new CreditCardViewModel(creditCard);
 
 				// decrypt the credit card
-				model.PlainTextCreditCard = this.creditCardService.DecryptCreditCard(model.EncryptedCreditCard, this.configuration.GetValue<string>("AesKey"), this.configuration.GetValue<string>("AesIv"));
+				model.PlainTextCreditCard = this.cryptoService.DecryptContent(model.EncryptedCreditCard);
 			}
 			catch (Exception e)
 			{
 				Trace.TraceError($"Unable to retrieve credit card: {e}");
-				return this.RedirectToAction(nameof(Index));
+				return this.RedirectToAction("Index");
 			}
 
 			return this.View(model);
 		}
 
-		// GET: Cryptography
-		public ActionResult Index()
+		/// <summary>
+		/// Displays the index view.
+		/// </summary>
+		/// <returns>Returns an action result.</returns>
+		[HttpGet]
+		[ActionName("Index")]
+		public async Task<ActionResult> IndexAsync()
 		{
 			var results = new List<CreditCardViewModel>();
+
+			try
+			{
+				var creditCards = await this.creditCardService.QueryAsync(c => true, null, 0);
+
+				results.AddRange(creditCards.Select(c => new CreditCardViewModel(c)));
+			}
+			catch (Exception e)
+			{
+				Trace.TraceError($"Unable to retrieve credit cards: {e}");
+			}
 
 			return View(results);
 		}

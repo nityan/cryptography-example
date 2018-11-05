@@ -119,7 +119,7 @@ namespace CryptographyExample.Controllers
 			{
 				var creditCards = await this.creditCardService.QueryAsync(c => true, null, 0);
 
-				results.AddRange(creditCards.Select(c => new CreditCardViewModel(c)));
+				results.AddRange(creditCards.Select(c => new CreditCardViewModel(c)).OrderByDescending(c => c.CreationTime));
 			}
 			catch (Exception e)
 			{

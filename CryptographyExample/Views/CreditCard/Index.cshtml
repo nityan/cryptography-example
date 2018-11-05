@@ -34,7 +34,7 @@
                 @Html.DisplayTextFor(model => item.EncryptedCreditCard)
             </td>
             <td>
-                @Html.DisplayTextFor(model => item.SignedCreditCard)
+                @Html.TextAreaFor(model => item.SignedCreditCard, new { @class = "form-control", cols = "25", rows = "10", @readonly = "readonly" })
             </td>
             <td>
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a>

@@ -38,10 +38,19 @@ namespace CryptographyExample.Models.CreditCardModels
 		}
 
 		/// <summary>
+		/// Gets or sets the company.
+		/// </summary>
+		/// <value>The company.</value>
+		[Required]
+		[StringLength(128)]
+		public string Company { get; set; }
+
+		/// <summary>
 		/// Gets or sets the credit card.
 		/// </summary>
 		/// <value>The credit card.</value>
 		[Required]
+		[Display(Name = "Credit Card")]
 		[DataType(DataType.CreditCard)]
 		public ulong CreditCard { get; set; }
 
@@ -51,6 +60,7 @@ namespace CryptographyExample.Models.CreditCardModels
 		/// <value>The CVC code.</value>
 		[Required]
 		[Range(000, 999)]
+		[Display(Name = "CVC Code")]
 		public uint CvcCode { get; set; }
 	}
 }

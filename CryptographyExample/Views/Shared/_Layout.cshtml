@@ -69,6 +69,32 @@
         <script src="~/js/site.min.js" asp-append-version="true"></script>
     </environment>
 
-    @RenderSection("Scripts", required: false)
+<script src="~/lib/jquery-validation-unobtrusive/jquery.unobtrusive-ajax.js"></script>
+<script type="text/javascript">
+    function hideLoadingBar(xhr)
+    {
+        $("#loading-bar").hide();
+
+        if (xhr !== undefined && xhr !== null)
+        {
+            if (typeof xhr.getResponseHeader === 'function')
+            {
+                var response = JSON.parse(xhr.getResponseHeader("X-Responded-JSON"));
+
+                if (response !== undefined && response !== null && response.status === 401)
+                {
+                    window.location = "@Url.Action("Login", "Account")";
+                }
+            }
+        }
+    }
+
+    function showLoadingBar()
+    {
+        $("#loading-bar").show();
+    }
+</script>
+
+@RenderSection("Scripts", required: false)
 </body>
 </html>

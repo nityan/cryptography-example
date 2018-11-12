@@ -32,10 +32,11 @@ namespace CryptographyExample.Services
 		/// <summary>
 		/// Creates the credit card asynchronously.
 		/// </summary>
+		/// <param name="company">The company.</param>
 		/// <param name="creditCard">The credit card.</param>
 		/// <param name="cvcCode">The CVC code.</param>
 		/// <returns>Returns the id of the created credit card.</returns>
-		Task<CreditCard> CreateCreditCardAsync(string creditCard, string cvcCode);
+		Task<CreditCard> CreateCreditCardAsync(string company, string creditCard, string cvcCode);
 
 		/// <summary>
 		/// Gets the credit card asynchronously.

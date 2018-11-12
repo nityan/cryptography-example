@@ -17,10 +17,16 @@
             @Html.DisplayFor(model => model.CreationTime)
         </dd>
         <dt>
+            @Html.DisplayNameFor(model => model.Company)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Company)
+        </dd>
+        <dt>
             @Html.DisplayNameFor(model => model.EncryptedCreditCard)
         </dt>
         <dd>
-            @Html.TextAreaFor(model => model.EncryptedCreditCard, new { @class = "form-control", cols="20", rows = 5, @readonly = "readonly"})
+            @Html.TextAreaFor(model => model.EncryptedCreditCard, new { @class = "form-control", cols = "20", rows = 5, @readonly = "readonly" })
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.SignedCreditCard)

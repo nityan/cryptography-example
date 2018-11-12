@@ -45,12 +45,19 @@ namespace CryptographyExample.Models.CreditCardModels
 		/// <param name="creditCard">The credit card.</param>
 		public CreditCardViewModel(CreditCard creditCard)
 		{
+			this.Company = creditCard.Company;
 			this.Id = creditCard.Id;
 			this.CreationTime = creditCard.CreationTime;
 			this.CvcCode = Encoding.UTF8.GetString(creditCard.CvcCode);
 			this.EncryptedCreditCard = creditCard.EncryptedCreditCard;
 			this.SignedCreditCard = creditCard.SignedCreditCard;
 		}
+
+		/// <summary>
+		/// Gets or sets the company.
+		/// </summary>
+		/// <value>The company.</value>
+		public string Company { get; set; }
 
 		/// <summary>
 		/// Gets or sets the identifier.

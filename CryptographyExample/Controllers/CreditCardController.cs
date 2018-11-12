@@ -27,6 +27,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace CryptographyExample.Controllers
 {
@@ -47,20 +48,28 @@ namespace CryptographyExample.Controllers
 		private readonly ICryptoService cryptoService;
 
 		/// <summary>
+		/// The logger service.
+		/// </summary>
+		private readonly ILoggerService loggerService;
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="CreditCardController" /> class.
 		/// </summary>
 		/// <param name="cryptoService">The crypto service.</param>
 		/// <param name="creditCardService">The credit card service.</param>
-		public CreditCardController(ICryptoService cryptoService, ICreditCardService creditCardService)
+		/// <param name="loggerService">The logger service.</param>
+		public CreditCardController(ICryptoService cryptoService, ICreditCardService creditCardService, ILoggerService loggerService)
 		{
 			this.cryptoService = cryptoService;
 			this.creditCardService = creditCardService;
+			this.loggerService = loggerService;
 		}
 
 		/// <summary>
 		/// Displays the create view.
 		/// </summary>
 		/// <returns>Returns an action result.</returns>
+		[HttpGet]
 		public ActionResult Create()
 		{
 			return View();
@@ -83,14 +92,14 @@ namespace CryptographyExample.Controllers
 					return View(model);
 				}
 
-				var creditCard = await this.creditCardService.CreateCreditCardAsync(model.CreditCard.ToString(), model.CvcCode.ToString());
+				var creditCard = await this.creditCardService.CreateCreditCardAsync(model.Company, model.CreditCard.ToString(), model.CvcCode.ToString());
 
 				return RedirectToAction("Details", new { id = creditCard.Id });
 			}
 			catch (Exception e)
 			{
 				this.ModelState.AddModelError("", "Unable to create credit card");
-				Trace.TraceError($"Unable to create credit card: {e}");
+				this.loggerService.LogError($"Unable to create credit card: {e}");
 
 				return View();
 			}
@@ -117,7 +126,7 @@ namespace CryptographyExample.Controllers
 			}
 			catch (Exception e)
 			{
-				Trace.TraceError($"Unable to retrieve credit card: {e}");
+				this.loggerService.LogError($"Unable to retrieve credit card: {e}");
 				return this.RedirectToAction("Index");
 			}
 
@@ -142,10 +151,46 @@ namespace CryptographyExample.Controllers
 			}
 			catch (Exception e)
 			{
-				Trace.TraceError($"Unable to retrieve credit cards: {e}");
+				this.loggerService.LogError($"Unable to retrieve credit cards: {e}");
 			}
 
 			return View(results);
+		}
+
+		/// <summary>
+		/// Displays the search view.
+		/// </summary>
+		/// <returns>Returns an action result.</returns>
+		[HttpGet]
+		public ActionResult Search()
+		{
+			return View();
+		}
+
+		/// <summary>
+		/// Searches for a credit card by company.
+		/// </summary>
+		/// <param name="company">The company.</param>
+		/// <returns>Returns an action result.</returns>
+		[HttpPost]
+		[ActionName("Search")]
+		[ValidateAntiForgeryToken]
+		public async Task<ActionResult> SearchAsync(string company)
+		{
+			var results = new List<CreditCardViewModel>();
+
+			try
+			{
+				var creditCards = await this.creditCardService.QueryAsync(c => c.Company.ToLower().Contains(company.ToLower()), null, 0);
+
+				results.AddRange(creditCards.Select(c => new CreditCardViewModel(c)).OrderByDescending(c => c.CreationTime));
+			}
+			catch (Exception e)
+			{
+				this.loggerService.LogError($"Unable to retrieve credit cards: {e}");
+			}
+
+			return this.PartialView("_CreditCardSearchResultsPartial", results);
 		}
 	}
 }

@@ -16,15 +16,22 @@
  * User: nitya
  * Date: 2018-11-4
  */
+
+using System;
+using System.Threading.Tasks;
 using CryptographyExample.Data;
 using CryptographyExample.Models;
 using CryptographyExample.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace CryptographyExample
 {
@@ -34,12 +41,19 @@ namespace CryptographyExample
 	public class Startup
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Startup"/> class.
+		/// The logger factory.
+		/// </summary>
+		private readonly ILoggerFactory loggerFactory;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Startup" /> class.
 		/// </summary>
 		/// <param name="configuration">The configuration.</param>
-		public Startup(IConfiguration configuration)
+		/// <param name="loggerFactory">The logger factory.</param>
+		public Startup(IConfiguration configuration, ILoggerFactory loggerFactory)
 		{
-			Configuration = configuration;
+			this.Configuration = configuration;
+			this.loggerFactory = loggerFactory;
 		}
 
 		/// <summary>
@@ -55,20 +69,68 @@ namespace CryptographyExample
 		/// <param name="env">The env.</param>
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
+			var logger = this.loggerFactory.CreateLogger<Startup>();
+
 			if (env.IsDevelopment())
 			{
-				app.UseBrowserLink();
-				app.UseDeveloperExceptionPage();
-				app.UseDatabaseErrorPage();
+				//app.UseBrowserLink();
+				//app.UseDeveloperExceptionPage();
+				//app.UseDatabaseErrorPage();
 			}
 			else
 			{
-				app.UseExceptionHandler("/Home/Error");
+				// force all the unhandled errors to show the not found page
+				// so that we mask as much as possible from the user as to what happened
+				// however, our not found action will log everything that happened for later use
+				app.UseExceptionHandler("/Error/NotFound");
+
+				// TODO
+				app.UseHsts();
 			}
 
-			app.UseStaticFiles();
+			app.Use(async (context, next) =>
+			{
+				try
+				{
+					// call next
+					await next.Invoke();
+				}
+				catch (Exception e)
+				{
+					logger.LogError(env.IsDevelopment() ? $"Unexpected error: {e}" : $"Unexpected error: {e.Message}");
+				}
+			});
+
+			app.Use(async (context, next) =>
+			{
+				context.Response.OnStarting((state) =>
+				{
+					context.Response.Headers["X-Frame-Options"] = "deny";
+					context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+					context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+					context.Response.Headers["Cache-Control"] = "no-cache";
+
+					return Task.CompletedTask;
+				}, context);
+
+				await next.Invoke();
+			});
+
+			app.UseStaticFiles(new StaticFileOptions
+			{
+				OnPrepareResponse = context =>
+				{
+					context.Context.Response.Headers["X-Frame-Options"] = "deny";
+					context.Context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+					context.Context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+					context.Context.Response.Headers["Cache-Control"] = "no-cache";
+				}
+			});
 
 			app.UseAuthentication();
+
+			// TODO
+			app.UseHttpsRedirection();
 
 			app.UseMvc(routes =>
 			{
@@ -88,10 +150,17 @@ namespace CryptographyExample
 				.AddEntityFrameworkStores<ApplicationDbContext>()
 				.AddDefaultTokenProviders();
 
+			services.AddLogging(c =>
+			{
+				c.AddConfiguration(this.Configuration.GetSection("Logging"));
+				c.AddEventSourceLogger();
+			});
+
 			// Add application services
 			services.AddTransient<ICryptoService, CryptoService>();
 			services.AddTransient<ICreditCardService, CreditCardService>();
 			services.AddTransient<IEmailSender, EmailSender>();
+			services.AddTransient<ILoggerService, LoggerService>();
 
 			services.AddMvc();
 		}

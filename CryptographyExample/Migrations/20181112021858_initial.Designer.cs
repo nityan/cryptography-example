@@ -11,8 +11,8 @@ using System;
 namespace CryptographyExample.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20181105051315_Initial")]
-    partial class Initial
+    [Migration("20181112021858_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -76,6 +76,10 @@ namespace CryptographyExample.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Company")
+                        .IsRequired()
+                        .HasMaxLength(128);
 
                     b.Property<DateTime>("CreationTime");
 

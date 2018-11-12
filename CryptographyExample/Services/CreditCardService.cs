@@ -67,16 +67,18 @@ namespace CryptographyExample.Services
 		/// <summary>
 		/// Creates the credit card asynchronously.
 		/// </summary>
+		/// <param name="company">The company.</param>
 		/// <param name="creditCard">The credit card.</param>
 		/// <param name="cvcCode">The CVC code.</param>
 		/// <returns>Returns the id of the created credit card.</returns>
-		public async Task<CreditCard> CreateCreditCardAsync(string creditCard, string cvcCode)
+		public async Task<CreditCard> CreateCreditCardAsync(string company, string creditCard, string cvcCode)
 		{
 			var encryptedContent = this.cryptoService.EncryptContent(creditCard);
 			var signedContent = this.cryptoService.SignContent(Convert.FromBase64String(encryptedContent));
 
 			var cc = new CreditCard(Guid.NewGuid(), DateTime.Now)
 			{
+				Company = company,
 				CvcCode = this.dataProtector.Protect(Encoding.UTF8.GetBytes(cvcCode)),
 				EncryptedCreditCard = encryptedContent,
 				SignedCreditCard = signedContent

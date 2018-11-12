@@ -50,6 +50,14 @@ namespace CryptographyExample.Models.DbModels
 		}
 
 		/// <summary>
+		/// Gets or sets the company.
+		/// </summary>
+		/// <value>The company.</value>
+		[Required]
+		[StringLength(128)]
+		public string Company { get; set; }
+
+		/// <summary>
 		/// Gets or sets the identifier.
 		/// </summary>
 		/// <value>The identifier.</value>

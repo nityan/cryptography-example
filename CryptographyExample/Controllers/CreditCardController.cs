@@ -70,7 +70,7 @@ namespace CryptographyExample.Controllers
 		/// </summary>
 		/// <returns>Returns an action result.</returns>
 		[HttpGet]
-		public ActionResult Create()
+		public IActionResult Create()
 		{
 			return View();
 		}
@@ -83,7 +83,7 @@ namespace CryptographyExample.Controllers
 		[HttpPost]
 		[ActionName("Create")]
 		[ValidateAntiForgeryToken]
-		public async Task<ActionResult> CreateAsync(CreateCreditCardModel model)
+		public async Task<IActionResult> CreateAsync(CreateCreditCardModel model)
 		{
 			try
 			{
@@ -111,7 +111,7 @@ namespace CryptographyExample.Controllers
 		/// <param name="id">The identifier.</param>
 		/// <returns>Returns an action result.</returns>
 		[ActionName("Details")]
-		public async Task<ActionResult> DetailsAsync(Guid id)
+		public async Task<IActionResult> DetailsAsync(Guid id)
 		{
 			CreditCardViewModel model;
 
@@ -139,7 +139,7 @@ namespace CryptographyExample.Controllers
 		/// <returns>Returns an action result.</returns>
 		[HttpGet]
 		[ActionName("Index")]
-		public async Task<ActionResult> IndexAsync()
+		public async Task<IActionResult> IndexAsync()
 		{
 			var results = new List<CreditCardViewModel>();
 
@@ -162,7 +162,7 @@ namespace CryptographyExample.Controllers
 		/// </summary>
 		/// <returns>Returns an action result.</returns>
 		[HttpGet]
-		public ActionResult Search()
+		public IActionResult Search()
 		{
 			return View();
 		}
@@ -175,7 +175,7 @@ namespace CryptographyExample.Controllers
 		[HttpPost]
 		[ActionName("Search")]
 		[ValidateAntiForgeryToken]
-		public async Task<ActionResult> SearchAsync(string company)
+		public async Task<IActionResult> SearchAsync(string company)
 		{
 			var results = new List<CreditCardViewModel>();
 

@@ -1,0 +1,60 @@
+﻿@model CryptographyExample.Models.CertificateModels.SearchCertificateModel
+
+@{
+    ViewData["Title"] = "Search";
+}
+
+<h2>Search</h2>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Search" method="POST" data-ajax-begin="onBegin" data-ajax-complete="onComplete"
+              data-ajax-failure="onFailed" data-ajax-success="onSuccess"
+              data-ajax="true" data-ajax-method="POST">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Company" class="control-label"></label>
+                <input asp-for="Company" class="form-control" />
+                <span asp-validation-for="Company" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Submit" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@Html.Partial("_LoadingBar")
+
+<div id="results">
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        var results = $("#results");
+        var onBegin = function ()
+        {
+            console.log("on begin");
+            showLoadingBar();
+        };
+
+        var onComplete = function (data)
+        {
+            console.log("on complete");
+            hideLoadingBar(data);
+        };
+
+        var onSuccess = function (data)
+        {
+            results.html(data);
+        };
+
+        var onFailed = function (error)
+        {
+            console.log(error);
+        };
+    </script>
+}

@@ -1,0 +1,53 @@
+﻿@model CryptographyExample.Models.CertificateModels.CertificateViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Credit Card</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.CreationTime)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CreationTime)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Company)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Company)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.EncryptedCreditCard)
+        </dt>
+        <dd>
+            @Html.TextAreaFor(model => model.EncryptedCreditCard, new { @class = "form-control", cols = "20", rows = 5, @readonly = "readonly" })
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SignedCreditCard)
+        </dt>
+        <dd>
+            @Html.TextAreaFor(model => model.SignedCreditCard, new { @class = "form-control", cols = "20", rows = 5, @readonly = "readonly" })
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PlainTextCreditCard)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PlainTextCreditCard)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CvcCode)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CvcCode)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

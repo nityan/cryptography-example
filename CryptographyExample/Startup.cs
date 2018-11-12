@@ -157,6 +157,7 @@ namespace CryptographyExample
 			});
 
 			// Add application services
+			services.AddTransient<ICertificateService, CertificateService>();
 			services.AddTransient<ICryptoService, CryptoService>();
 			services.AddTransient<ICreditCardService, CreditCardService>();
 			services.AddTransient<IEmailSender, EmailSender>();

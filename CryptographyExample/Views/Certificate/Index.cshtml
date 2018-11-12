@@ -1,0 +1,46 @@
+﻿@model IEnumerable<CryptographyExample.Models.CertificateModels.CertificateViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+    <a asp-action="Search" class="btn btn-primary">Search</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.CreationTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Company)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EncryptedCreditCard)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayTextFor(model => item.CreationTime)
+            </td>
+            <td>
+                @Html.DisplayTextFor(model => item.Company)
+            </td>
+            <td>
+                @Html.TextAreaFor(model => item.EncryptedCreditCard, new { @class = "form-control", cols = "25", rows = "10", @readonly = "readonly" })
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

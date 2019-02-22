@@ -84,30 +84,49 @@ namespace CryptographyExample
 				// however, our not found action will log everything that happened for later use
 				app.UseExceptionHandler("/Error/NotFound");
 
-				// TODO
+				// security strict transport header
+				// indicates to the browser and client side application
+				// to force all content over HTTPS when loading resources
+				// such as images, css, js, and other content
 				app.UseHsts();
 			}
 
+			// adds a custom request processor to the request pipeline
+			// the reason for this is to add custom functionality to our request pipeline
 			app.Use(async (context, next) =>
 			{
 				try
 				{
-					// call next
+					// calls the next function in the pipeline
 					await next.Invoke();
 				}
 				catch (Exception e)
 				{
+					// log any exception which occurred during the request processing
 					logger.LogError(env.IsDevelopment() ? $"Unexpected error: {e}" : $"Unexpected error: {e.Message}");
 				}
 			});
 
+			// add a custom middleware, which does the following
+			// before each response rewrite various headers to add security to the response
 			app.Use(async (context, next) =>
 			{
+				// when the response writing begins
 				context.Response.OnStarting((state) =>
 				{
-					context.Response.Headers["X-Frame-Options"] = "deny";
+					// deny the X-Frame-Options
+					// indicates to the browser or another application, that this content should not be allowed to be
+					// included in a frame
+					context.Response.Headers["X-Frame-Options"] = "deny; allow-sites=https://example.com";
+
+					// prevent "sniffing" of the content type
+					// this prevents applications from guessing the content type of files or responses
 					context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+
+					// block cross site scripting
 					context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+
+					// force the browser to not cache anything
 					context.Response.Headers["Cache-Control"] = "no-cache";
 
 					return Task.CompletedTask;
